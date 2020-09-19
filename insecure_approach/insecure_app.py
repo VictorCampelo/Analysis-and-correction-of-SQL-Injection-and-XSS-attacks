@@ -2,11 +2,12 @@
 import os
 import sqlite3
 
-from flask import Flask
+from flask import Flask, render_template
 from flask import redirect
 from flask import request
 from flask import session
 from jinja2 import Template
+
 
 app = Flask(__name__)
 
@@ -116,13 +117,7 @@ def user_delete_time_line_of_id(uid, tid):
 
 
 def render_login_page():
-    return '''
-<form method="POST" style="margin: 60px auto; width: 140px;">
-    <p><input name="username" type="text" /></p>
-    <p><input name="password" type="password" /></p>
-    <p><input value="Login" type="submit" /></p>
-</form>
-    '''
+    return render_template('login.html')
 
 
 def render_home_page(uid):
@@ -159,6 +154,7 @@ def render_home_page(uid):
 def index():
     if 'uid' in session:
         return render_home_page(session['uid'])
+
     return redirect('/login')
 
 
@@ -174,7 +170,11 @@ def login():
             session['uid'] = user['id']
             return redirect('/')
         else:
-            return redirect('/login')
+            return '''
+                <div class="alert alert-danger" role="alert">
+                A simple danger alert—check it out!
+                </div>'''
+            redirect('/login')
 
 
 @app.route('/create_time_line', methods=['POST'])
@@ -200,5 +200,5 @@ def logout():
 
 
 if __name__ == '__main__':
-    # init()
+    init()
     app.run(debug=False, port=5001)
