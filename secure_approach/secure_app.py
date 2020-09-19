@@ -2,7 +2,7 @@
 import os
 import sqlite3
 
-from flask import Flask
+from flask import Flask, render_template
 from flask import redirect
 from flask import request
 from flask import session
@@ -102,14 +102,7 @@ def user_delete_time_line_of_id(uid, tid):
     db.session.commit()
 
 def render_login_page():
-    return '''
-<form method="POST" style="margin: 60px auto; width: 140px;">
-    Login
-    <p>Usuário: <input name="username" type="text" /></p>
-    <p>Senha: <input name="password" type="password" /></p>
-    <p><input value="Login" type="submit" /></p>
-</form>
-    '''
+    return render_template('login.html')
 
 
 def render_home_page(uid):
@@ -144,9 +137,7 @@ def render_home_page(uid):
 
 @app.route('/')
 def index():
-    if 'uid' in session:
-        return render_home_page(session['uid'])
-    return redirect('/login')
+    return render_template('login.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -189,5 +180,5 @@ def logout():
 
 
 if __name__ == '__main__':
-    #init()
+  #  init()
     app.run(debug=False, port=5000)
