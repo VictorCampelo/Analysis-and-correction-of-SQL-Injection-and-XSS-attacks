@@ -104,6 +104,7 @@ def user_delete_time_line_of_id(uid, tid):
 def render_login_page():
     return '''
 <form method="POST" style="margin: 60px auto; width: 140px;">
+    Login
     <p>Usuário: <input name="username" type="text" /></p>
     <p>Senha: <input name="password" type="password" /></p>
     <p><input value="Login" type="submit" /></p>
@@ -116,12 +117,12 @@ def render_home_page(uid):
     time_lines = get_time_lines()
     template = Template('''
 <div style="width: 400px; margin: 80px auto; ">
-    <h4>I am: {{ user['username'] }}</h4>
+    <h4>Usuário logado: {{ user['username'] }}</h4>
 
     <form method="POST" action="/create_time_line">
-        Add time line:
+        Adicionar Comentário:
         <input type="text" name="content" />
-        <input type="submit" value="Submit" />
+        <input type="submit" value="Publicar" />
     </form>
 
     <ul style="border-top: 1px solid #ccc;">
