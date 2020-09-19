@@ -170,11 +170,7 @@ def login():
             session['uid'] = user['id']
             return redirect('/')
         else:
-            return '''
-                <div class="alert alert-danger" role="alert">
-                A simple danger alert—check it out!
-                </div>'''
-            redirect('/login')
+            return redirect('/login')
 
 
 @app.route('/create_time_line', methods=['POST'])
