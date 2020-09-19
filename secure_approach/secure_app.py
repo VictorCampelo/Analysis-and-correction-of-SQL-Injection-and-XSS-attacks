@@ -7,13 +7,12 @@ from flask import redirect
 from flask import request
 from flask import session
 from flask import escape
-from jinja2 import Template
 
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-app.secret_key = 'schrodinger cat'
+app.secret_key = 'TDSDI3'
 
 DATABASE_PATH = os.path.join(os.path.dirname(__file__), 'app.db')
 
@@ -43,22 +42,25 @@ class User(db.Model):
 
 
 def init_data():
-    u1 = User(username='user1', password='123456')
+    u1 = User(username='Andre', password='123456')
     Time_line(content='Hello!', user=u1)
     db.session.add(u1)
     
-    u2 = User(username='user2', password='123456')
+    u2 = User(username='Matheus', password='123456')
     Time_line(content='Hello!', user=u2)
     db.session.add(u2)
     
     db.session.commit()
 
+
 def init():
     db.create_all()
     init_data()
 
+
 def connect_db():
     return sqlite3.connect(DATABASE_PATH)
+
 
 def get_user_from_username_and_password(username, password):
     # conn = connect_db()
@@ -92,14 +94,18 @@ def create_time_line(uid, content):
 def get_time_lines():
     tl = Time_line.query.order_by(Time_line.id.desc()).all()
 
-    return map(lambda tl: {'id': tl.id, 'user_id': tl.user_id, 'content': tl.content}, tl)
+    return map(lambda tl: {'id': tl.id,
+                           'user_id': tl.user_id,
+                           'content': tl.content,
+                           'username': get_user_from_id(tl.user_id)['username']
+                           }, tl)
 
 
-
-def user_delete_time_line_of_id(uid, tid):
+def user_delete_time_line_of_id(tid):
     tl = Time_line.query.filter_by(id=tid).first()
     db.session.delete(tl)
     db.session.commit()
+
 
 def render_login_page():
     return render_template('login.html')
@@ -108,31 +114,7 @@ def render_login_page():
 def render_home_page(uid):
     user = get_user_from_id(uid)
     time_lines = get_time_lines()
-    template = Template('''
-<div style="width: 400px; margin: 80px auto; ">
-    <h4>Usuário logado: {{ user['username'] }}</h4>
-
-    <form method="POST" action="/create_time_line">
-        Adicionar Comentário:
-        <input type="text" name="content" />
-        <input type="submit" value="Publicar" />
-    </form>
-
-    <ul style="border-top: 1px solid #ccc;">
-        {% for line in time_lines %}
-        <li style="border-top: 1px solid #efefef;">
-            <p>{{ line['content'] }}</p>
-
-            {% if line['user_id'] == user['id'] %}
-            <a href="/delete/time_line/{{ line['id'] }}">Delete</a>
-            {% endif %}
-
-        </li>
-        {% endfor %}
-    </ul>
-</div>
-    ''')
-    return template.render(user=user, time_lines=time_lines)
+    return render_template('homePage.html', user=user, time_lines=time_lines)
 
 
 @app.route('/')
@@ -160,7 +142,7 @@ def login():
             session['uid'] = user['id']
             return redirect('/')
         else:
-            return redirect('/login')
+            return render_template('login.html', erro='1')
 
 
 @app.route('/create_time_line', methods=['POST'])
@@ -188,5 +170,4 @@ def logout():
 
 
 if __name__ == '__main__':
-  #  init()
     app.run(debug=False, port=5000)
