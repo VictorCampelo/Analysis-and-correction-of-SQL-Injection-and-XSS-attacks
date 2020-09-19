@@ -104,8 +104,8 @@ def user_delete_time_line_of_id(uid, tid):
 def render_login_page():
     return '''
 <form method="POST" style="margin: 60px auto; width: 140px;">
-    <p><input name="username" type="text" /></p>
-    <p><input name="password" type="password" /></p>
+    <p>Usuário: <input name="username" type="text" /></p>
+    <p>Senha: <input name="password" type="password" /></p>
     <p><input value="Login" type="submit" /></p>
 </form>
     '''
@@ -188,5 +188,5 @@ def logout():
 
 
 if __name__ == '__main__':
-    # init()
+    #init()
     app.run(debug=False, port=5000)
