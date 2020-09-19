@@ -6,8 +6,6 @@ from flask import Flask, render_template
 from flask import redirect
 from flask import request
 from flask import session
-from jinja2 import Template
-
 
 app = Flask(__name__)
 
@@ -105,7 +103,11 @@ def get_time_lines():
     conn.commit()
     conn.close()
 
-    return map(lambda row: {'id': row[0], 'user_id': row[1], 'content': row[2],'username': get_user_from_id(row[1])['username']}, rows)
+    return map(lambda row: {'id': row[0],
+                            'user_id': row[1],
+                            'content': row[2],
+                            'username': get_user_from_id(row[1])['username']
+                            }, rows)
 
 
 def user_delete_time_line_of_id(uid, tid):
@@ -117,7 +119,8 @@ def user_delete_time_line_of_id(uid, tid):
 
 
 def render_login_page():
-    return render_template('login.html',erro='0')
+    return render_template('login.html', erro='0')
+
 
 def get_usernames(time_lines):
     usernames = []
@@ -126,10 +129,14 @@ def get_usernames(time_lines):
         print(get_user_from_id(lines)['username'])
     return usernames
 
+
 def render_home_page(uid):
     user = get_user_from_id(uid)
     time_lines = get_time_lines()
     return render_template('homePage.html', user=user, time_lines=time_lines)
+
+class A():
+    pass
 
 @app.route('/')
 def index():
@@ -137,11 +144,12 @@ def index():
         if 'uid' in session:
             return render_home_page(session['uid'])
         return redirect('/login')
-    except:
+    except :
         init()
         if 'uid' in session:
             return render_home_page(session['uid'])
         return redirect('/login')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -182,4 +190,3 @@ def logout():
 
 if __name__ == '__main__':
     app.run(debug=False, port=5001)
-

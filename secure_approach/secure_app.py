@@ -137,7 +137,15 @@ def render_home_page(uid):
 
 @app.route('/')
 def index():
-    return render_template('login.html')
+    try:
+        if 'uid' in session:
+            return render_home_page(session['uid'])
+        return redirect('/login')
+    except:
+        init()
+        if 'uid' in session:
+            return render_home_page(session['uid'])
+        return redirect('/login')
 
 
 @app.route('/login', methods=['GET', 'POST'])
