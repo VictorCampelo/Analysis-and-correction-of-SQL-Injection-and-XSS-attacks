@@ -65,7 +65,11 @@ def init():
 def get_user_from_username_and_password(username, password):
     conn = connect_db()
     cur = conn.cursor()
-    cur.execute('SELECT id, username FROM `user` WHERE username=\'%s\' AND password=\'%s\'' % (username, password))
+    try:
+        cur.execute('SELECT id, username FROM `user` WHERE username=\'%s\' AND password=\'%s\'' % (username, password))
+    except:
+        init()
+        cur.execute('SELECT id, username FROM `user` WHERE username=\'%s\' AND password=\'%s\'' % (username, password))
     row = cur.fetchone()
     conn.commit()
     conn.close()
@@ -76,7 +80,11 @@ def get_user_from_username_and_password(username, password):
 def get_user_from_id(uid):
     conn = connect_db()
     cur = conn.cursor()
-    cur.execute('SELECT id, username FROM `user` WHERE id=%d' % uid)
+    try:
+        cur.execute('SELECT id, username FROM `user` WHERE id=%d' % uid)
+    except:
+        init()
+        cur.execute('SELECT id, username FROM `user` WHERE id=%d' % uid)
     row = cur.fetchone()
     conn.commit()
     conn.close()
@@ -135,20 +143,12 @@ def render_home_page(uid):
     time_lines = get_time_lines()
     return render_template('homePage.html', user=user, time_lines=time_lines)
 
-class A():
-    pass
 
 @app.route('/')
 def index():
-    try:
-        if 'uid' in session:
-            return render_home_page(session['uid'])
-        return redirect('/login')
-    except :
-        init()
-        if 'uid' in session:
-            return render_home_page(session['uid'])
-        return redirect('/login')
+    if 'uid' in session:
+        return render_home_page(session['uid'])
+    return redirect('/login')
 
 
 @app.route('/login', methods=['GET', 'POST'])
