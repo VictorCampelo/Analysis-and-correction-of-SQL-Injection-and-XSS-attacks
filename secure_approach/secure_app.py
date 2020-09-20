@@ -26,13 +26,11 @@ app.secret_key = 'schrodinger cat'
 db = SQLAlchemy(app)
 
     
-class Time_line(db.Model):
+class TimeLine(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text, unique=False, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'),
-        nullable=False)
-    user = db.relationship('User',
-        backref=db.backref('time_line', lazy=True))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', backref=db.backref('time_line', lazy=True))
 
 
 class User(db.Model):
@@ -43,11 +41,11 @@ class User(db.Model):
 
 def init_data():
     u1 = User(username='Andre', password='123456')
-    Time_line(content='Hello!', user=u1)
+    TimeLine(content='Hello!', user=u1)
     db.session.add(u1)
     
     u2 = User(username='Matheus', password='123456')
-    Time_line(content='Hello!', user=u2)
+    TimeLine(content='Hello!', user=u2)
     db.session.add(u2)
     
     db.session.commit()
@@ -66,7 +64,12 @@ def get_user_from_username_and_password(username, password):
     # conn = connect_db()
     # cur = conn.cursor()
     # cur.execute('SELECT id, username FROM `user` WHERE username=\'%s\' AND password=\'%s\'' % (username, password))
-    user = User.query.filter_by(username=username, password=password).first()
+    try:
+        user = User.query.filter_by(username=username, password=password).first()
+    except:
+        init()
+        user = User.query.filter_by(username=username, password=password).first()
+
     # row = cur.fetchone()
     # conn.commit()
     # conn.close()
@@ -75,14 +78,18 @@ def get_user_from_username_and_password(username, password):
 
 
 def get_user_from_id(uid):
-    user = User.query.filter_by(id=uid).first()
+    try:
+        user = User.query.filter_by(id=uid).first()
+    except:
+        init()
+        user = User.query.filter_by(id=uid).first()
     
     return {'id': user.id, 'username': user.username} if user is not None else None
 
 
 def create_time_line(uid, content):
     user = User.query.filter_by(id=uid).first()
-    tl = Time_line(content=content, user=user)
+    tl = TimeLine(content=content, user=user)
     
     db.session.add(tl)
     
@@ -92,17 +99,17 @@ def create_time_line(uid, content):
 
 
 def get_time_lines():
-    tl = Time_line.query.order_by(Time_line.id.desc()).all()
+    tls = TimeLine.query.order_by(TimeLine.id.desc()).all()
 
     return map(lambda tl: {'id': tl.id,
                            'user_id': tl.user_id,
                            'content': tl.content,
                            'username': get_user_from_id(tl.user_id)['username']
-                           }, tl)
+                           }, tls)
 
 
 def user_delete_time_line_of_id(tid):
-    tl = Time_line.query.filter_by(id=tid).first()
+    tl = TimeLine.query.filter_by(id=tid).first()
     db.session.delete(tl)
     db.session.commit()
 
@@ -119,15 +126,9 @@ def render_home_page(uid):
 
 @app.route('/')
 def index():
-    try:
-        if 'uid' in session:
-            return render_home_page(session['uid'])
-        return redirect('/login')
-    except:
-        init()
-        if 'uid' in session:
-            return render_home_page(session['uid'])
-        return redirect('/login')
+    if 'uid' in session:
+        return render_home_page(session['uid'])
+    return redirect('/login')
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -158,7 +159,7 @@ def time_line():
 @app.route('/delete/time_line/<tid>')
 def delete_time_line(tid):
     if 'uid' in session:
-        user_delete_time_line_of_id(session['uid'], tid)
+        user_delete_time_line_of_id(tid)
     return redirect('/')
 
 
