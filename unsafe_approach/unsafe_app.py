@@ -6,6 +6,7 @@ from flask import Flask, render_template
 from flask import redirect
 from flask import request
 from flask import session
+from jinja2 import Template
 
 app = Flask(__name__)
 
@@ -141,7 +142,32 @@ def get_usernames(time_lines):
 def render_home_page(uid):
     user = get_user_from_id(uid)
     time_lines = get_time_lines()
-    return render_template('homePage.html', user=user, time_lines=time_lines)
+    template = Template('''
+<div style="width: 400px; margin-top: 123x; margin: auto;  ">
+
+
+        <h4>Usuário: {{ user['username'] }}</h4>
+        <a style="margin-bottom:100px" href="\login">Sair </a>
+
+    <form method="POST" action="/create_time_line" style="margin-top=60px">
+         Comentário:
+         <input name="content" type="text" required >
+         <button class="btn btn-primary" type="submit" style="margin-left:20px">Publicar</button>
+    </form>
+
+    <ul style="border-top: 1px solid #ccc; margin-top:10px" class="list-group">
+        {% for line in time_lines %}
+        <li style="border-top: 1px solid #efefef;" class="list-group-item">
+            <p><b>{{line['username']}}</b> {{ line['content']  }} </p>
+            {% if line['user_id'] == user['id'] %}
+            <a href="/delete/time_line/{{ line['id'] }}" style="margin-left:220px" >Apagar comentário</a>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+    ''')
+    return template.render(user=user, time_lines=time_lines)
 
 
 @app.route('/')
