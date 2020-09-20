@@ -4,36 +4,71 @@
   <meta charset="utf-8">
     <title> Pagina inicial </title>
 
-    <link href="{{ url_for('static', filename='assets/dist/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='assets/dist/css/bootstrap.min.css') }}" rel="stylesheet" id="bootstrap-css">
 
-
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
     <!-- Custom styles for this template -->
     <link href="{{ url_for('static', filename = 'css/home_page.css') }}"  rel="stylesheet">
 </head>
 
 <body>
-<div style="width: 400px; margin-top: 123x; margin: auto;  ">
+<div style="width: 1000px; margin-top: 123x; margin: auto;  ">
 
 
         <h4>Usuário: {{ user['username'] }}</h4>
         <a style="margin-bottom:100px" href="\login">Sair </a>
-
+<div class="form-group">
     <form method="POST" action="/create_time_line" style="margin-top=60px">
-         Comentário:
-         <input name="content" type="text" required >
-         <button class="btn btn-primary" type="submit" style="margin-left:20px">Publicar</button>
+        <label for="comment">Adicionar Comentário:</label>
+        <textarea name="content" class="form-control" rows="5" id="comment"></textarea>
+        <button class="btn btn-primary" type="submit">Publicar</button>
     </form>
-
-    <ul style="border-top: 1px solid #ccc; margin-top:10px" class="list-group">
-        {% for line in time_lines %}
-        <li style="border-top: 1px solid #efefef;" class="list-group-item">
-            <p><b>{{line['username']}}</b> {{ line['content']  }} </p>
-            {% if line['user_id'] == user['id'] %}
-            <a href="/delete/time_line/{{ line['id'] }}" style="margin-left:220px" >Apagar comentário</a>
-            {% endif %}
-        </li>
-        {% endfor %}
-    </ul>
+</div>
+    <div class="panel panel-default widget">
+        <div class="panel-heading">
+            <span class="glyphicon glyphicon-comment"></span>
+            <h3 class="panel-title">
+                Comentários recentes</h3>
+            <span class="label label-info">
+                78</span>
+        </div>
+        <div class="panel-body">
+            <ul class="list-group">
+                {% for line in time_lines %}
+                <li class="list-group-item">
+                    <div class="row">
+                    
+                        <div class="col-xs-10 col-md-11">
+                            <div>
+                                <div class="mic-info">
+                                    By: <a href="#">{{line['username']}}</a> on 19 set 2020
+                                </div>
+                            </div>
+                            <div class="comment-text">
+                                {{ line['content']  }}
+                            </div>
+                            <div class="action">
+                                {% if line['user_id'] == user['id'] %}
+                                <a href="/delete/time_line/{{ line['id'] }}">
+                                    <button type="button" class="btn btn-danger btn-xs" title="Delete">
+                                        Apagar comentário
+                                    </button>
+                                </a>
+                                {% endif %}
+                                <!-- {% if line['user_id'] == user['id'] %}
+                                <a href="/delete/time_line/{{ line['id'] }}" style="margin-left:220px" >Apagar comentário</a>
+                                {% endif %} -->
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            <a href="#" class="btn btn-primary btn-sm btn-block" role="button"><span class="glyphicon glyphicon-refresh"></span> More</a>
+        </div>
+    </div>
 </div>
 </body>
 </html>
