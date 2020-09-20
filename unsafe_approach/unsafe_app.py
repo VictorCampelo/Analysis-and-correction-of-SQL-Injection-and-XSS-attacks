@@ -143,29 +143,72 @@ def render_home_page(uid):
     user = get_user_from_id(uid)
     time_lines = get_time_lines()
     template = Template('''
-<div style="width: 400px; margin-top: 123x; margin: auto;  ">
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+    <title> Pagina inicial (Unsafe) </title>
+    
+     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+</head>
+
+<body style="padding-top: 40px;  background-color: #f5f5f5; padding-bottom: 40px; ">
+<div style="width: 1000px; margin-top: 20px; margin: auto;  ">
 
 
         <h4>Usuário: {{ user['username'] }}</h4>
         <a style="margin-bottom:100px" href="\login">Sair </a>
-
-    <form method="POST" action="/create_time_line" style="margin-top=60px">
-         Comentário:
-         <input name="content" type="text" required >
-         <button class="btn btn-primary" type="submit" style="margin-left:20px">Publicar</button>
+<div class="form-group">
+    <form method="POST" action="/create_time_line" >
+        <label for="comment" style="margin-top:40px">Adicionar Comentário:</label>
+        <textarea name="content" class="form-control" rows="5" id="comment"></textarea>
+        <button class="btn btn-primary" type="submit" style="margin-top:10px; margin-left:900px">Publicar</button>
     </form>
-
-    <ul style="border-top: 1px solid #ccc; margin-top:10px" class="list-group">
-        {% for line in time_lines %}
-        <li style="border-top: 1px solid #efefef;" class="list-group-item">
-            <p><b>{{line['username']}}</b> {{ line['content']  }} </p>
-            {% if line['user_id'] == user['id'] %}
-            <a href="/delete/time_line/{{ line['id'] }}" style="margin-left:220px" >Apagar comentário</a>
-            {% endif %}
-        </li>
-        {% endfor %}
-    </ul>
 </div>
+    <div class="panel panel-default widget">
+        <div class="panel-heading">
+            <span class="glyphicon glyphicon-comment"></span>
+            <h4 class="panel-title">
+                Comentários recentes</h4>
+            <span class="label label-info"></span>
+        </div>
+        <div class="panel-body">
+            <ul class="list-group">
+                {% for line in time_lines %}
+                <li class="list-group-item">
+                    <div class="row">
+                    
+                        <div class="col-xs-10 col-md-11">
+                            <div>
+                                <div class="mic-info">
+                                    <b>{{line['username']}}</b> em 19 de set 2020
+                                </div>
+                            </div>
+                            <div class="comment-text">
+                                {{ line['content']  }}
+                            </div>
+                            <div class="action">
+                                {% if line['user_id'] == user['id'] %}
+                                <a href="/delete/time_line/{{ line['id'] }}">
+                                    <button type="button" class="btn btn-danger btn-xs" title="Delete" style="margin-left:710px">
+                                        Apagar comentário
+                                    </button>
+                                </a>
+                                {% endif %}
+                                <!-- {% if line['user_id'] == user['id'] %}
+                                <a href="/delete/time_line/{{ line['id'] }}" style="margin-left:220px" >Apagar comentário</a>
+                                {% endif %} -->
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+</body>
     ''')
     return template.render(user=user, time_lines=time_lines)
 
