@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Safe</title>
+		 <!-- Bootstrap core CSS -->
+		
+		<link href="{{ url_for('static', filename = 'style.css') }}"  rel="stylesheet">
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+	</head>
+	<body>
+		<div class="login">
+			<h1>Safe Login</h1>
+			<div class="links">
+				<a href="{{ url_for('login') }}" class="active">Entrar</a>
+				<a href="#">Registrar</a>
+			</div>
+			<form action="{{ url_for('login') }}" method="post">
+				<label for="username">
+					<i class="fas fa-user"></i>
+				</label>
+				<input type="text" name="username" placeholder="Nome de Usuário" id="username" required>
+				<label for="password">
+					<i class="fas fa-lock"></i>
+				</label>
+				<input type="password" name="password" placeholder="Senha" id="password" required>
+				<div class="msg">{{ msg }}</div>
+				<div class="checkbox mb-3">
+					{% if  erro == '1' %}
+					  <div class="alert alert-danger" role="alert">
+					  Usuário ou senha incorretos !
+					  </div>
+					{% endif %}
+				  </div>
+				<input type="submit" value="Entrar">
+			</form>
+		</div>
+	</body>
+</html>
