@@ -12,7 +12,7 @@ app = Flask(__name__)
 
 app.secret_key = 'TDSDI3'
 
-DATABASE_PATH = os.path.join(os.path.dirname(__file__), 'database.db')
+DATABASE_PATH = os.path.join(os.path.dirname(__file__), 'app.db')
 
 
 def connect_db():
@@ -66,11 +66,7 @@ def init():
 def get_user_from_username_and_password(username, password):
     conn = connect_db()
     cur = conn.cursor()
-    try:
-        cur.execute('SELECT id, username FROM `user` WHERE username=\'%s\' AND password=\'%s\'' % (username, password))
-    except:
-        init()
-        cur.execute('SELECT id, username FROM `user` WHERE username=\'%s\' AND password=\'%s\'' % (username, password))
+    cur.execute('SELECT id, username FROM `user` WHERE username=\'%s\' AND password=\'%s\'' % (username, password))
     row = cur.fetchone()
     conn.commit()
     conn.close()
@@ -81,11 +77,7 @@ def get_user_from_username_and_password(username, password):
 def get_user_from_id(uid):
     conn = connect_db()
     cur = conn.cursor()
-    try:
-        cur.execute('SELECT id, username FROM `user` WHERE id=%d' % uid)
-    except:
-        init()
-        cur.execute('SELECT id, username FROM `user` WHERE id=%d' % uid)
+    cur.execute('SELECT id, username FROM `user` WHERE id=%d' % uid)
     row = cur.fetchone()
     conn.commit()
     conn.close()
@@ -158,7 +150,7 @@ def render_home_page(uid):
 
 
         <h4>Usuário: {{ user['username'] }}</h4>
-        <a style="margin-bottom:100px" href="\login">Sair </a>
+        <a style="margin-bottom:100px" href="\logout">Sair </a>
 <div class="form-group">
     <form method="POST" action="/create_time_line" >
         <label for="comment" style="margin-top:40px">Adicionar Comentário:</label>
@@ -256,6 +248,17 @@ def logout():
         session.pop('uid')
     return redirect('/login')
 
+def hasSQLite3(filename):
+    from os.path import isfile, getsize
+
+    if not isfile(filename):
+        return False
+    if getsize(filename) < 100: # SQLite database file header is 100 bytes
+        return False
+
+    return True
 
 if __name__ == '__main__':
+    if not hasSQLite3(DATABASE_PATH):
+        init()
     app.run(debug=False, port=5001)
